@@ -1,11 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
-import socket, { joinRoom } from '@/lib/socket';
+import { useEffect, useRef, useState } from "react";
+import socket, { joinRoom } from "@/lib/socket";
+import axios from "axios";
 
 const DrawingBoard = ({ room }) => {
   const canvasRef = useRef(null);
   const contextRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [color, setColor] = useState('black');
+  const [color, setColor] = useState("black");
   const [lineWidth, setLineWidth] = useState(5);
   const [isClient, setIsClient] = useState(false);
 
@@ -17,8 +18,8 @@ const DrawingBoard = ({ room }) => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
 
-      const context = canvas.getContext('2d');
-      context.lineCap = 'round';
+      const context = canvas.getContext("2d");
+      context.lineCap = "round";
       context.strokeStyle = color; // Set initial stroke color
       context.lineWidth = lineWidth; // Set initial line width
       contextRef.current = context;
@@ -27,12 +28,12 @@ const DrawingBoard = ({ room }) => {
         joinRoom(room);
       }
 
-      socket.on('draw', ({ x0, y0, x1, y1, color, lineWidth }) => {
+      socket.on("draw", ({ x0, y0, x1, y1, color, lineWidth }) => {
         drawLine(x0, y0, x1, y1, color, lineWidth);
       });
 
       return () => {
-        socket.off('draw');
+        socket.off("draw");
       };
     }
   }, [room, color, lineWidth, isClient]);
@@ -55,13 +56,31 @@ const DrawingBoard = ({ room }) => {
     contextRef.current.moveTo(offsetX, offsetY);
   };
 
-  const handleMouseMove = ({ nativeEvent }) => {
+  const handleMouseMove = async ({ nativeEvent }) => {
     if (!isDrawing) return;
     const { offsetX, offsetY } = nativeEvent;
-    const { offsetX: x0, offsetY: y0 } = contextRef.current.lastPos || { offsetX, offsetY };
+    const { offsetX: x0, offsetY: y0 } = contextRef.current.lastPos || {
+      offsetX,
+      offsetY,
+    };
     drawLine(x0, y0, offsetX, offsetY, color, lineWidth);
     contextRef.current.lastPos = { offsetX, offsetY };
-    socket.emit('draw', { room, x0, y0, x1: offsetX, y1: offsetY, color, lineWidth });
+    socket.emit("draw", {
+      room,
+      x0,
+      y0,
+      x1: offsetX,
+      y1: offsetY,
+      color,
+      lineWidth,
+    });
+    await axios.post("/api/game/updatestate", {
+      offsetX,
+      offsetY,
+      color,
+      lineWidth,
+      room,
+    });
   };
 
   const handleMouseUp = () => {
@@ -72,7 +91,7 @@ const DrawingBoard = ({ room }) => {
 
   const clearCanvas = () => {
     const canvas = canvasRef.current;
-    const context = canvas.getContext('2d');
+    const context = canvas.getContext("2d");
     context.clearRect(0, 0, canvas.width, canvas.height);
   };
 
@@ -95,7 +114,10 @@ const DrawingBoard = ({ room }) => {
               min="1"
               max="50"
             />
-            <button onClick={clearCanvas} className="bg-red-500 text-white px-4 py-2 rounded">
+            <button
+              onClick={clearCanvas}
+              className="bg-red-500 text-white px-4 py-2 rounded"
+            >
               Clear
             </button>
           </div>

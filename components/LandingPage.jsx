@@ -14,8 +14,12 @@ export default function LandingPage() {
       return;
     }
     try {
-      const res = await axios.post("/api/user/signup", { name });
+      const res = await axios.post("/api/user/signup", {
+        userName: name,
+        roomName: room,
+      });
       console.log(res);
+      localStorage.setItem("roomId", res.data.room.id);
       router.push(`/room/${room}`);
     } catch (error) {
       console.log(error);
