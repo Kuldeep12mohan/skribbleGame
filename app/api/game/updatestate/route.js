@@ -15,7 +15,6 @@ export const POST = async (request) => {
       offsetY,
       lineWidth,
       color,
-      roomId: room.id,
     },
   });
   return NextResponse.json({

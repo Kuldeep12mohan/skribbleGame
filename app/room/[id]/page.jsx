@@ -11,7 +11,9 @@ const Room = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen">
+      <div> users</div>
       <DrawingBoard room={room} />
+      <dir>chatting section</dir>
     </div>
   );
 };

@@ -14,7 +14,7 @@ CREATE TABLE "GameState" (
     "offsetY" INTEGER,
     "color" TEXT,
     "lineWidth" INTEGER,
-    "roomId" TEXT NOT NULL,
+    "roomName" TEXT NOT NULL,
 
     CONSTRAINT "GameState_pkey" PRIMARY KEY ("id")
 );
@@ -28,10 +28,13 @@ CREATE TABLE "Room" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "GameState_roomId_key" ON "GameState"("roomId");
+CREATE UNIQUE INDEX "GameState_roomName_key" ON "GameState"("roomName");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Room_name_key" ON "Room"("name");
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_roomId_fkey" FOREIGN KEY ("roomId") REFERENCES "Room"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "GameState" ADD CONSTRAINT "GameState_roomId_fkey" FOREIGN KEY ("roomId") REFERENCES "Room"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "GameState" ADD CONSTRAINT "GameState_roomName_fkey" FOREIGN KEY ("roomName") REFERENCES "Room"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

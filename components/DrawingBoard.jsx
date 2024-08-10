@@ -13,6 +13,12 @@ const DrawingBoard = ({ room }) => {
   useEffect(() => {
     setIsClient(true);
 
+    const fetchGameState = async()=>{
+      const res = await axios.get(`/api/game/getstate?id=${localStorage.getItem("roomId")}`)
+      console.log(res);
+    }
+    fetchGameState()
+
     if (isClient) {
       const canvas = canvasRef.current;
       canvas.width = window.innerWidth;
